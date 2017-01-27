@@ -2,7 +2,9 @@
 title: "The commanalities among employees who leave"
 author: "Youhee Shin"
 date: "January 25, 2017"
-output: html_document
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -53,12 +55,20 @@ options(knitr.kable.NA = '')
 
 First we load the data to use.
 
-```{r}
+```{r echo=TRUE, tidy=TRUE}
 ProjectData <- read.csv("./data/HR_DATA.csv")
 ```
 
 ```{r}
-thecorr = round(cor(ProjectData[,1:8]),2)
+ProjectDataFactor=ProjectData[,2:9]
+rownames(ProjectDataFactor) <- paste0("ID ", sprintf("%02i", 1:nrow(ProjectDataFactor)))
+knitr::kable(round(ProjectDataFactor, 2)[1:10, ])
+```
+
+This is the correlation matrix.
+
+```{r echo=FALSE, tidy=TRUE}
+thecorr = round(cor(ProjectData[,2:9]),2)
 iprint.df(round(thecorr,2), scale=TRUE)
 ```
 
