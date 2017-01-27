@@ -11,10 +11,32 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Objective
 
-sdfsdfsdfsdf
+The objective of this analytical report is to help companies identify good employees who are at risk of leaving the company. With this information, companies can allocate their finances and resources on in areas that can help in retaining good employees.  
 
 ## Analysis Process 
-fhghgghgh
+
+1) Basic Analysis and Visualisation
+
+- check and standardize data
+- correlation matrix
+- choose key factors
+- interpret key factors
+
+2) Cluster Analysis and Segmentation
+
+- scale the data
+- select segmentation variables
+- method and number of segments
+- profile and interpret the segments
+- robustness analysis
+
+3) Drivers of Leaving Company
+
+- classification tree
+- profit curve
+
+4) Business Decisions
+
 ## Business 
 
 ## Data Analysis
