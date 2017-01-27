@@ -11,11 +11,10 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Objective
 
-The goal of our group project for BDA
-
+sdfsdfsdfsdf
 
 ## Analysis Process 
-
+fhghgghgh
 ## Business 
 
 ## Data Analysis
