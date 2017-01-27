@@ -9,6 +9,15 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Background
+## Objective
 
-## Background
+The goal of our group project for BDA
+
+
+## Analysis Process 
+
+## Business 
+
+## Data Analysis
+
+## Conclusion 
