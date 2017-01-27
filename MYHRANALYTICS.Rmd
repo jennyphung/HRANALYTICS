@@ -14,7 +14,13 @@ knitr::opts_chunk$set(echo = TRUE)
 sdfsdfsdfsdf
 
 ## Analysis Process 
-fhghgghgh
+1. correlation
+2. visualization of data
+3. segmentation
+4. clustering
+5. price
+
+
 ## Business 
 
 ## Data Analysis
