@@ -1,6 +1,6 @@
 ---
-title: "The commanalities among employees who leave"
-author: "Youhee Shin"
+title: "Identifying Good employees at risk of leaving"
+author: "Yonatan Avivi, Hiroko Okamura, Jenny Phung, Youhee Shin"
 date: "January 25, 2017"
 output: html_document
 ---
@@ -11,18 +11,52 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Objective
 
-sdfsdfsdfsdf
+The objective of this analytical report is to help companies identify good employees who are at risk of leaving the company. With this information, companies can allocate their finances and resources on in areas that can help in retaining good employees.  
+
 
 ## Analysis Process 
-1. correlation
-2. visualization of data
-3. segmentation
-4. clustering
-5. price
+<<<<<<< HEAD
+
+First, we will analyze and visualize the data to get a basic understanding of the data inhand (Human Resources Analytics by Ludovic Benistant from kaggle.com). After basic understanding of the data, we will check the correlation of the factors to identify and interpret the key factors that drive employees to leave. 
+
+Second, we will segment the employees across two dimensions + add more
+
+Finally, we will bucket the employees who have stayed across two dimensions, performance and risk of leaving, in order to predict and identify the characteristics of employees companies generally wish to retain even at a higher cost - high performing employees with high risk of leaving (and maybe even identify the low performing employees with low possiblity of leaving). This will help the company to target and invest in their human resources and reduce the risk and negative impact of losing high performing employees.
+
+## Data Analysis (Process structure)
+
+1. Basic Analysis and Visualisation
+
+1.1 Data Understanding
+1.2 Check and standardize data
+1.3 Correlation matrix
+1.4 Key factors 
+1.5 Interpret key factors
+
+2. Cluster Analysis and Segmentation
+
+2.1 Scale the data
+2.2 Select segmentation variables
+2.3 Method and number of segments
+2.4 Profile and interpret the segments
+2.5 Robustness analysis
+
+3. Drivers of Leaving Company
+
+3.1 Classification tree
+3.2 Profit curve
+
+4. Business Decisions
+
+## Data Analysis (Coding part)
 
 
-## Business 
+First we load the data to use.
 
-## Data Analysis
+```{r , fig.width=4, fig.height=4}
+data <- read.csv("./data/HR_comma_sep.csv")
+head(data)
+summary(data)
+```
 
 ## Conclusion 
