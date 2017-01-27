@@ -51,12 +51,24 @@ Finally, we will bucket the employees who have stayed across two dimensions, per
 ## Data Analysis (Coding part)
 
 
+```{r setuplibraries, echo=FALSE, message=FALSE}
+suppressWarnings(source("../INSEADAnalytics//AnalyticsLibraries/library.R"))
+# Package options
+suppressWarnings(ggthemr('fresh'))  # ggplot theme
+opts_knit$set(progress=FALSE, verbose=FALSE)
+opts_chunk$set(echo=FALSE, fig.align="center", fig.width=10, fig.height=6.35, results="asis")
+options(knitr.kable.NA = '')
+```
+
 First we load the data to use.
 
-```{r , fig.width=4, fig.height=4}
-data <- read.csv("./data/HR_comma_sep.csv")
-head(data)
-summary(data)
+```{r}
+ProjectData <- read.csv("./data/HR_DATA.csv")
+```
+
+```{r}
+thecorr = round(cor(ProjectData[,1:8]),2)
+iprint.df(round(thecorr,2), scale=TRUE)
 ```
 
 ## Conclusion 
