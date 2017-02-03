@@ -131,7 +131,6 @@ profile_attributes_used <- intersect(profile_attributes_used, 1:ncol(ProjectData
 
 ProjectData_segment <- ProjectDataFactor_scaled[,segmentation_attributes_used]
 ProjectData_profile <- ProjectDataFactor_scaled[,profile_attributes_used]
-
 ```
 
 Here are the differences between the observations using the distance metric we selected:
@@ -203,11 +202,12 @@ Having decided how many clusters to use, we would like to get a better understan
 Let's see first how many observations we have in each segment, for the segments we selected above:
 
 ```{r}
-cluster_ids <- cluster_memberships
+cluster_memberships <- cluster_memberships_hclust
+cluster_ids <-  cluster_ids_hclust
 
 cluster_size = NULL
-for (i in sort(unique(cluster_ids))){
-  cluster_size = c(cluster_size,sum(cluster_ids == i))
+for (i in sort(unique(cluster_memberships))){
+  cluster_size = c(cluster_size,sum(cluster_memberships == i))
   }
 cluster_size = matrix(cluster_size, nrow=1)
 colnames(cluster_size) <- paste("Segment", 1:length(cluster_size), sep=" ")
@@ -218,9 +218,6 @@ iprint.df(cluster_size, scale=TRUE)
 The average values of our data for the total population as well as within each customer segment are:
 
 ```{r}
-cluster_memberships <- cluster_memberships_hclust
-cluster_ids <-  cluster_ids_hclust  
-
 NewData = matrix(cluster_memberships,ncol=1)
 
 population_average = matrix(apply(ProjectData_profile, 2, mean), ncol=1)
@@ -257,37 +254,12 @@ profile_attributes_used <- intersect(profile_attributes_used, 1:ncol(ProjectData
 
 ProjectData_segment <- ProjectDataFactor_scaled[,segmentation_attributes_used]
 ProjectData_profile <- ProjectDataFactor_scaled[,profile_attributes_used]
-
-```
-
-Here are the differences between the observations using the distance metric we selected:
-
-```{r}
-euclidean_pairwise <- as.matrix(dist(head(ProjectData_segment, 10), method="euclidean"))
-euclidean_pairwise <- euclidean_pairwise*lower.tri(euclidean_pairwise) + euclidean_pairwise*diag(euclidean_pairwise) + 10e10*upper.tri(euclidean_pairwise)
-euclidean_pairwise[euclidean_pairwise==10e10] <- NA
-rownames(euclidean_pairwise) <- colnames(euclidean_pairwise) <- sprintf("Obs.%02d", 1:10)
-
-iprint.df(round(euclidean_pairwise,2))
 ```
 
 
 ## 2.2 (2nd try) Visualize Pair-wise Distances
 
-We can see the histogram of, say, the first 2 variables.
-
-```{r}
-do.call(grid.arrange, lapply(1:2, function(n) {
-  qplot(ProjectData_segment[, n], xlab=paste("Histogram of Variable", n), ylab="Frequency", binwidth=0.2)
-}))
-```
-
-or the histogram of all pairwise distances for the `r distance_used` distance:
-
-```{r}
-Pairwise_Distances <- dist(ProjectData_segment, method = distance_used) 
-qplot(as.vector(Pairwise_Distances), xlab="Histogram of all pairwise Distances between observtions", ylab="Frequency", binwidth=0.2)
-```
+Let us skip this subsection for the 2nd try.
 
 
 ## 2.3 (2nd try) Number of Segments
@@ -329,11 +301,12 @@ Having decided how many clusters to use, we would like to get a better understan
 Let's see first how many observations we have in each segment, for the segments we selected above:
 
 ```{r}
-cluster_ids <- cluster_memberships
+cluster_memberships <- cluster_memberships_hclust
+cluster_ids <-  cluster_ids_hclust
 
 cluster_size = NULL
-for (i in sort(unique(cluster_ids))){
-  cluster_size = c(cluster_size,sum(cluster_ids == i))
+for (i in sort(unique(cluster_memberships))){
+  cluster_size = c(cluster_size,sum(cluster_memberships == i))
   }
 cluster_size = matrix(cluster_size, nrow=1)
 colnames(cluster_size) <- paste("Segment", 1:length(cluster_size), sep=" ")
@@ -344,9 +317,6 @@ iprint.df(cluster_size, scale=TRUE)
 The average values of our data for the total population as well as within each customer segment are:
 
 ```{r}
-cluster_memberships <- cluster_memberships_hclust
-cluster_ids <-  cluster_ids_hclust  
-
 NewData = matrix(cluster_memberships,ncol=1)
 
 population_average = matrix(apply(ProjectData_profile, 2, mean), ncol=1)
@@ -362,7 +332,6 @@ knitr::kable(round(cluster.profile, 2))
 
 Everyone in the Segment 5 had work accident, which does not look good segmentations.
 Let's try the analysis again excluding work accident information.
-
 
 
 ## 2.1 (3rd try) Select segmentation variables and methods
@@ -384,37 +353,12 @@ profile_attributes_used <- intersect(profile_attributes_used, 1:ncol(ProjectData
 
 ProjectData_segment <- ProjectDataFactor_scaled[,segmentation_attributes_used]
 ProjectData_profile <- ProjectDataFactor_scaled[,profile_attributes_used]
-
-```
-
-Here are the differences between the observations using the distance metric we selected:
-
-```{r}
-euclidean_pairwise <- as.matrix(dist(head(ProjectData_segment, 10), method="euclidean"))
-euclidean_pairwise <- euclidean_pairwise*lower.tri(euclidean_pairwise) + euclidean_pairwise*diag(euclidean_pairwise) + 10e10*upper.tri(euclidean_pairwise)
-euclidean_pairwise[euclidean_pairwise==10e10] <- NA
-rownames(euclidean_pairwise) <- colnames(euclidean_pairwise) <- sprintf("Obs.%02d", 1:10)
-
-iprint.df(round(euclidean_pairwise,2))
 ```
 
 
 ## 2.2 (3rd try) Visualize Pair-wise Distances
 
-We can see the histogram of, say, the first 2 variables.
-
-```{r}
-do.call(grid.arrange, lapply(1:2, function(n) {
-  qplot(ProjectData_segment[, n], xlab=paste("Histogram of Variable", n), ylab="Frequency", binwidth=0.2)
-}))
-```
-
-or the histogram of all pairwise distances for the `r distance_used` distance:
-
-```{r}
-Pairwise_Distances <- dist(ProjectData_segment, method = distance_used) 
-qplot(as.vector(Pairwise_Distances), xlab="Histogram of all pairwise Distances between observtions", ylab="Frequency", binwidth=0.2)
-```
+Let us skip this subsection for the 3rd try.
 
 
 ## 2.3 (3rd try) Number of Segments
@@ -456,11 +400,12 @@ Having decided how many clusters to use, we would like to get a better understan
 Let's see first how many observations we have in each segment, for the segments we selected above:
 
 ```{r}
-cluster_ids <- cluster_memberships
+cluster_memberships <- cluster_memberships_hclust
+cluster_ids <-  cluster_ids_hclust
 
 cluster_size = NULL
-for (i in sort(unique(cluster_ids))){
-  cluster_size = c(cluster_size,sum(cluster_ids == i))
+for (i in sort(unique(cluster_memberships))){
+  cluster_size = c(cluster_size,sum(cluster_memberships == i))
   }
 cluster_size = matrix(cluster_size, nrow=1)
 colnames(cluster_size) <- paste("Segment", 1:length(cluster_size), sep=" ")
@@ -471,9 +416,6 @@ iprint.df(cluster_size, scale=TRUE)
 The average values of our data for the total population as well as within each customer segment are:
 
 ```{r}
-cluster_memberships <- cluster_memberships_hclust
-cluster_ids <-  cluster_ids_hclust  
-
 NewData = matrix(cluster_memberships,ncol=1)
 
 population_average = matrix(apply(ProjectData_profile, 2, mean), ncol=1)
@@ -497,21 +439,19 @@ knitr::kable(round(cluster.profile, 2))
 
 ```{r setupclassification, echo=TRUE, tidy=TRUE}
 dependent_variable = 7
-independent_variables = c(1:6,8:9)
+independent_variables = c(1:5,8:9)
 
 Probability_Threshold = 0.5
 
 estimation_data_percent = 80
 validation_data_percent = 10
 
-# Please enter 0 if you want to "randomly" split the data in estimation and validation/test
 random_sampling = 0
 
-# Tree parameter
-# PLEASE ENTER THE Tree (CART) complexity control cp (e.g. 0.001 to 0.02, depending on the data)
+# Tree (CART) complexity control cp (e.g. 0.001 to 0.02, depending on the data)
 CART_cp = 0.01
 
-# Please enter the minimum size of a segment for the analysis to be done only for that segment
+# the minimum size of a segment for the analysis to be done only for that segment
 min_segment = 100
 ```
 
@@ -527,7 +467,7 @@ CART_control = rpart.control(cp = CART_cp)
 ```
 
 ```{r}
-# FIrst we split the data in estimation, validation, and test
+# First we split the data in estimation, validation, and test
 
 if (random_sampling){
   estimation_data_ids=sample.int(nrow(ProjectDataFactor_scaled),floor(estimation_data_percent*nrow(ProjectDataFactor_scaled)/100))
