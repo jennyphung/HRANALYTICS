@@ -165,13 +165,15 @@ qplot(as.vector(Pairwise_Distances), xlab="Histogram of all pairwise Distances b
 
 ## 2.3 (1st try) Number of Segments
 
-Let's use Hierarchical Clustering methods. It may be useful to see the dendrogram from , to have a quick idea of how the data may be segmented and how many segments there may be. Here is the dendrogram for our data:
+Let's use Hierarchical Clustering methods. It may be useful to see the dendrogram from, to have a quick idea of how the data may be segmented and how many segments there may be. Here is the dendrogram for our data:
 
 ```{r}
 Hierarchical_Cluster_distances <- dist(ProjectData_segment, method=distance_used)
 Hierarchical_Cluster <- hclust(Hierarchical_Cluster_distances, method=hclust_method)
 # Display dendogram
 iplot.dendrogram(Hierarchical_Cluster)
+# TODO: Draw dendogram with red borders around the 3 clusters
+#rect.hclust(Hierarchical_Cluster, k=numb_clusters_used, border="red")
 ```
 
 We can also plot the "distances" traveled before we need to merge any of the lower and smaller in size clusters into larger ones - the heights of the tree branches that link the clusters as we traverse the tree from its leaves to its root. If we have n observations, this plot has n-1 numbers, we see the first 20 here.
@@ -264,18 +266,12 @@ Let us skip this subsection for the 2nd try.
 
 ## 2.3 (2nd try) Number of Segments
 
-Let's use Hierarchical Clustering methods. It may be useful to see the dendrogram from , to have a quick idea of how the data may be segmented and how many segments there may be. Here is the dendrogram for our data:
+Let's plot the "distances" traveled before we need to merge any of the lower and smaller in size clusters into larger ones.
 
 ```{r}
 Hierarchical_Cluster_distances <- dist(ProjectData_segment, method=distance_used)
 Hierarchical_Cluster <- hclust(Hierarchical_Cluster_distances, method=hclust_method)
-# Display dendogram
-iplot.dendrogram(Hierarchical_Cluster)
-```
 
-We can also plot the "distances" traveled before we need to merge any of the lower and smaller in size clusters into larger ones - the heights of the tree branches that link the clusters as we traverse the tree from its leaves to its root. If we have n observations, this plot has n-1 numbers, we see the first 20 here.
-
-```{r}
 num <- nrow(ProjectData) - 1
 df1 <- cbind(as.data.frame(Hierarchical_Cluster$height[length(Hierarchical_Cluster$height):1]), c(1:num))
 colnames(df1) <- c("distances","index")
@@ -363,18 +359,12 @@ Let us skip this subsection for the 3rd try.
 
 ## 2.3 (3rd try) Number of Segments
 
-Let's use Hierarchical Clustering methods. It may be useful to see the dendrogram from , to have a quick idea of how the data may be segmented and how many segments there may be. Here is the dendrogram for our data:
+Let's plot the "distances" traveled before we need to merge any of the lower and smaller in size clusters into larger ones.
 
 ```{r}
 Hierarchical_Cluster_distances <- dist(ProjectData_segment, method=distance_used)
 Hierarchical_Cluster <- hclust(Hierarchical_Cluster_distances, method=hclust_method)
-# Display dendogram
-iplot.dendrogram(Hierarchical_Cluster)
-```
 
-We can also plot the "distances" traveled before we need to merge any of the lower and smaller in size clusters into larger ones - the heights of the tree branches that link the clusters as we traverse the tree from its leaves to its root. If we have n observations, this plot has n-1 numbers, we see the first 20 here.
-
-```{r}
 num <- nrow(ProjectData) - 1
 df1 <- cbind(as.data.frame(Hierarchical_Cluster$height[length(Hierarchical_Cluster$height):1]), c(1:num))
 colnames(df1) <- c("distances","index")
