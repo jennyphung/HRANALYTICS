@@ -235,7 +235,7 @@ We use all the variables except "Whether the employee has left." and department.
 
 ```{r setupcluster2, echo=TRUE, tidy=TRUE}
 segmentation_attributes_used = c(1:6,8:9)
-profile_attributes_used = c(1:9)
+profile_attributes_used = c(1:19)
 numb_clusters_used = 5
 profile_with = "hclust"
 distance_used = "euclidean"
@@ -361,6 +361,141 @@ rownames(cluster_profile_ratios) <- colnames(ProjectData)[profile_attributes_use
 ## printing the result in a clean-slate table
 iprint.df(round(cluster_profile_ratios, 2))
 ```
+
+
+## 2.1 (3rd try) Select segmentation variables and methods
+
+We use all the variables except "Whether the employee has left." and department. We use Euclidean distance.
+
+```{r setupcluster3, echo=TRUE, tidy=TRUE}
+segmentation_attributes_used = c(1:5,8:9)
+profile_attributes_used = c(1:19)
+numb_clusters_used = 5
+profile_with = "hclust"
+distance_used = "euclidean"
+hclust_method = "ward.D"
+```
+
+```{r}
+segmentation_attributes_used <- intersect(segmentation_attributes_used, 1:ncol(ProjectDataFactor))
+profile_attributes_used <- intersect(profile_attributes_used, 1:ncol(ProjectDataFactor))
+
+ProjectData_segment <- ProjectDataFactor_scaled[,segmentation_attributes_used]
+ProjectData_profile <- ProjectDataFactor_scaled[,profile_attributes_used]
+
+```
+
+Here are the differences between the observations using the distance metric we selected:
+
+```{r}
+euclidean_pairwise <- as.matrix(dist(head(ProjectData_segment, 10), method="euclidean"))
+euclidean_pairwise <- euclidean_pairwise*lower.tri(euclidean_pairwise) + euclidean_pairwise*diag(euclidean_pairwise) + 10e10*upper.tri(euclidean_pairwise)
+euclidean_pairwise[euclidean_pairwise==10e10] <- NA
+rownames(euclidean_pairwise) <- colnames(euclidean_pairwise) <- sprintf("Obs.%02d", 1:10)
+
+iprint.df(round(euclidean_pairwise,2))
+```
+
+
+## 2.2 (3rd try) Visualize Pair-wise Distances
+
+We can see the histogram of, say, the first 2 variables.
+
+```{r}
+do.call(grid.arrange, lapply(1:2, function(n) {
+  qplot(ProjectData_segment[, n], xlab=paste("Histogram of Variable", n), ylab="Frequency", binwidth=0.2)
+}))
+```
+
+or the histogram of all pairwise distances for the `r distance_used` distance:
+
+```{r}
+Pairwise_Distances <- dist(ProjectData_segment, method = distance_used) 
+qplot(as.vector(Pairwise_Distances), xlab="Histogram of all pairwise Distances between observtions", ylab="Frequency", binwidth=0.2)
+```
+
+
+## 2.3 (3rd try) Number of Segments
+
+Let's use Hierarchical Clustering methods. It may be useful to see the dendrogram from , to have a quick idea of how the data may be segmented and how many segments there may be. Here is the dendrogram for our data:
+
+```{r}
+Hierarchical_Cluster_distances <- dist(ProjectData_segment, method=distance_used)
+Hierarchical_Cluster <- hclust(Hierarchical_Cluster_distances, method=hclust_method)
+# Display dendogram
+iplot.dendrogram(Hierarchical_Cluster)
+```
+
+We can also plot the "distances" traveled before we need to merge any of the lower and smaller in size clusters into larger ones - the heights of the tree branches that link the clusters as we traverse the tree from its leaves to its root. If we have n observations, this plot has n-1 numbers, we see the first 20 here.
+
+```{r}
+num <- nrow(ProjectData) - 1
+df1 <- cbind(as.data.frame(Hierarchical_Cluster$height[length(Hierarchical_Cluster$height):1]), c(1:num))
+colnames(df1) <- c("distances","index")
+iplot.df(melt(head(df1, 20), id="index"), xlab="Number of Components")
+```
+
+For now let's consider the 5-segments solution. We can also see the segment each observation (respondent in this case) belongs to for the first 20 people:
+
+```{r}
+cluster_memberships_hclust <- as.vector(cutree(Hierarchical_Cluster, 5))
+cluster_ids_hclust = unique(cluster_memberships_hclust)
+
+ProjectData_with_hclust_membership <- cbind(1:length(cluster_memberships_hclust),cluster_memberships_hclust)
+colnames(ProjectData_with_hclust_membership)<-c("Observation Number","Cluster_Membership")
+
+knitr::kable(round(head(ProjectData_with_hclust_membership, 20), 2))
+```
+
+## 2.4 (3rd try) Profile and interpret the segments
+
+Having decided how many clusters to use, we would like to get a better understanding of who the customers in those clusters are and interpret the segments.
+
+Let's see first how many observations we have in each segment, for the segments we selected above:
+
+```{r}
+cluster_ids <- cluster_memberships
+
+cluster_size = NULL
+for (i in sort(unique(cluster_ids))){
+  cluster_size = c(cluster_size,sum(cluster_ids == i))
+  }
+cluster_size = matrix(cluster_size, nrow=1)
+colnames(cluster_size) <- paste("Segment", 1:length(cluster_size), sep=" ")
+rownames(cluster_size) <- "Number of Obs."
+iprint.df(cluster_size, scale=TRUE)
+```
+
+The average values of our data for the total population as well as within each customer segment are:
+
+```{r}
+cluster_memberships <- cluster_memberships_hclust
+cluster_ids <-  cluster_ids_hclust  
+
+NewData = matrix(cluster_memberships,ncol=1)
+
+population_average = matrix(apply(ProjectData_profile, 2, mean), ncol=1)
+colnames(population_average) <- "Population"
+Cluster_Profile_mean <- sapply(sort(cluster_ids), function(i) apply(ProjectData_profile[(cluster_memberships==i), ], 2, mean))
+if (ncol(ProjectData_profile) <2)
+  Cluster_Profile_mean=t(Cluster_Profile_mean)
+colnames(Cluster_Profile_mean) <- paste("Segment", 1:length(cluster_ids), sep=" ")
+cluster.profile <- cbind (population_average,Cluster_Profile_mean)
+
+knitr::kable(round(cluster.profile, 2))
+```
+
+we can measure the ratios of the average for each cluster to the average of the population and subtract 1 (e.g. `avg(cluster)` `/` `avg(population)` `- 1`) and explore a matrix as the following one:
+
+```{r}
+population_average_matrix <- population_average[,"Population",drop=F] %*% matrix(rep(1,ncol(Cluster_Profile_mean)),nrow=1)
+cluster_profile_ratios <- (ifelse(population_average_matrix==0, 0,Cluster_Profile_mean/population_average_matrix-1))
+colnames(cluster_profile_ratios) <- paste("Segment", 1:ncol(cluster_profile_ratios), sep=" ")
+rownames(cluster_profile_ratios) <- colnames(ProjectData)[profile_attributes_used]
+## printing the result in a clean-slate table
+iprint.df(round(cluster_profile_ratios, 2))
+```
+
 
 
 # 3. Drivers of Leaving Company
