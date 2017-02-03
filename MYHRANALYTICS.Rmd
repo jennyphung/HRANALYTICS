@@ -367,7 +367,7 @@ iprint.df(round(cluster_profile_ratios, 2))
 
 We use all the variables except "Whether the employee has left." and department. We use Euclidean distance.
 
-```{r setupcluster3, echo=TRUE, tidy=TRUE}
+```{r, echo=TRUE, tidy=TRUE}
 segmentation_attributes_used = c(1:5,8:9)
 profile_attributes_used = c(1:19)
 numb_clusters_used = 5
