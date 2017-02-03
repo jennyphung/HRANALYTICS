@@ -231,6 +231,7 @@ cluster.profile <- cbind (population_average,Cluster_Profile_mean)
 knitr::kable(round(cluster.profile, 2))
 ```
 
+
 we can measure the ratios of the average for each cluster to the average of the population and subtract 1 (e.g. `avg(cluster)` `/` `avg(population)` `- 1`) and explore a matrix as the following one:
 
 ```{r}
