@@ -178,10 +178,10 @@ colnames(df1) <- c("distances","index")
 iplot.df(melt(head(df1, 20), id="index"), xlab="Number of Components")
 ```
 
-For now let's consider the 5-segments solution. We can also see the segment each observation (respondent in this case) belongs to for the first 20 people:
+For now let's consider the 4-segments solution. We can also see the segment each observation (respondent in this case) belongs to for the first 20 people:
 
 ```{r}
-cluster_memberships_hclust <- as.vector(cutree(Hierarchical_Cluster, 5))
+cluster_memberships_hclust <- as.vector(cutree(Hierarchical_Cluster, 4))
 cluster_ids_hclust = unique(cluster_memberships_hclust)
 
 ProjectData_with_hclust_membership <- cbind(1:length(cluster_memberships_hclust),cluster_memberships_hclust)
