@@ -5,6 +5,7 @@ date: "January 25, 2017"
 output:
   html_document: default
   pdf_document: default
+  word_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -189,7 +190,7 @@ colnames(ProjectData_with_hclust_membership)<-c("Observation Number","Cluster_Me
 knitr::kable(round(head(ProjectData_with_hclust_membership, 20), 2))
 ```
 
-## 2.5 (1st try) Profile and interpret the segments
+## 2.4 (1st try) Profile and interpret the segments
 
 Having decided how many clusters to use, we would like to get a better understanding of who the customers in those clusters are and interpret the segments. 
 
@@ -199,7 +200,6 @@ The average values of our data for the total population as well as within each c
 cluster_memberships <- cluster_memberships_hclust
 cluster_ids <-  cluster_ids_hclust  
 
-# SAVE THE DATA in the cluster file
 NewData = matrix(cluster_memberships,ncol=1)
 
 population_average = matrix(apply(ProjectData_profile, 2, mean), ncol=1)
@@ -234,7 +234,7 @@ Let's try the analysis again excluding department information.
 We use all the variables except "Whether the employee has left." and department. We use Euclidean distance.
 
 ```{r setupcluster2, echo=TRUE, tidy=TRUE}
-segmentation_attributes_used = c(1:6,9)
+segmentation_attributes_used = c(1:6,8:9)
 profile_attributes_used = c(1:9)
 numb_clusters_used = 5
 profile_with = "hclust"
@@ -263,7 +263,7 @@ iprint.df(round(euclidean_pairwise,2))
 ```
 
 
-## 2.2 (2ns try) Visualize Pair-wise Distances
+## 2.2 (2nd try) Visualize Pair-wise Distances
 
 We can see the histogram of, say, the first 2 variables.
 
@@ -313,9 +313,24 @@ colnames(ProjectData_with_hclust_membership)<-c("Observation Number","Cluster_Me
 knitr::kable(round(head(ProjectData_with_hclust_membership, 20), 2))
 ```
 
-## 2.5 (2nd try) Profile and interpret the segments
+## 2.4 (2nd try) Profile and interpret the segments
 
-Having decided how many clusters to use, we would like to get a better understanding of who the customers in those clusters are and interpret the segments. 
+Having decided how many clusters to use, we would like to get a better understanding of who the customers in those clusters are and interpret the segments.
+
+Let's see first how many observations we have in each segment, for the segments we selected above:
+
+```{r}
+cluster_ids <- cluster_memberships
+
+cluster_size = NULL
+for (i in sort(unique(cluster_ids))){
+  cluster_size = c(cluster_size,sum(cluster_ids == i))
+  }
+cluster_size = matrix(cluster_size, nrow=1)
+colnames(cluster_size) <- paste("Segment", 1:length(cluster_size), sep=" ")
+rownames(cluster_size) <- "Number of Obs."
+iprint.df(cluster_size, scale=TRUE)
+```
 
 The average values of our data for the total population as well as within each customer segment are:
 
@@ -323,7 +338,6 @@ The average values of our data for the total population as well as within each c
 cluster_memberships <- cluster_memberships_hclust
 cluster_ids <-  cluster_ids_hclust  
 
-# SAVE THE DATA in the cluster file
 NewData = matrix(cluster_memberships,ncol=1)
 
 population_average = matrix(apply(ProjectData_profile, 2, mean), ncol=1)
@@ -349,19 +363,7 @@ iprint.df(round(cluster_profile_ratios, 2))
 ```
 
 
-
-
-
-## 2.6 Robustness analysis
-
-
-
-# 3. Drivers of Leaving Company
-
-### 3.1 Classification tree
-### 3.2 Profit curve
-
-## 4. Business Decisions
+# 3. Business Decisions
 
 
 # Conclusion 
