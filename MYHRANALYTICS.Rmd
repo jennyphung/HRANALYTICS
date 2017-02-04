@@ -1,23 +1,28 @@
 ---
 title: "Identifying Good employees at risk of leaving"
 author: "Yonatan Avivi, Hiroko Okamura, Jenny Phung, Youhee Shin"
-date: "January 25, 2017"
+date: "February 3, 2017"
 output:
   html_document: default
   pdf_document: default
+  word_document: default
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Objective
+# Objective
 
 The objective of this analytical report is to help companies identify good employees who are at risk of leaving the company. With this information, companies can allocate their finances and resources on in areas that can help in retaining good employees.  
 
 
+<<<<<<< HEAD
 
 ## Analysis Process 
+=======
+# Analysis Process 
+>>>>>>> 3005105d1533c66557162419af5def90cbad78ec
 
 First, we will analyze and visualize the data to get a basic understanding of the data inhand (*Human Resources Analytics by Ludovic Benistant from kaggle.com*). After obtaining a basic understanding of the data, we will check the correlation of the factors to identify and interpret the key factors that drive employees to leave. 
 
@@ -36,10 +41,10 @@ options(knitr.kable.NA = '')
 ```
 
 
-### 1. Data check and Visualisation
+# 1. Data check and Visualisation
 
 
-1.1 Load and Explore the data
+## 1.1 Load and Explore the data
 
 First, let's load the data to use.
 
@@ -83,7 +88,7 @@ knitr::kable(round(my_summary(ProjectDataFactor), 2))
 ```
 
 
-1.2 Scale the data
+## 1.2 Scale the data
 
 Here, we are standardizing the data in order to avoid having the problem of the result being driven by a few relatively large values. We will scale the data between 0 and 1. 
 
@@ -98,7 +103,7 @@ knitr::kable(round(my_summary(ProjectDataFactor_scaled), 2))
 ```
 
 
-1.3 Check Correlations
+## 1.3 Check Correlations
 
 The simplest way to have a first look at a dataset is to check the correlation. By doing this, we can easily see which factors have a high positive/negative correlation with leaving employees. This is different from a causality, therefore we cannot conclude that a highly correlated factor (independent variables) leads an employee to leave (dependent variable). Also, if some of the factors (independent variables) are highly correlated with each other, we could also consider to group these attributes together.
 
@@ -110,17 +115,13 @@ iprint.df(round(thecorr,2))
 The most significant variable is 'Satisfaction level', which is strongly negatively correlated with employees leaving, (*input number*), which is quite obvious. The satisfaction level is also negatively correlated with time spent at the company, and number of projects. This can be interpreted as 'the longer the employee has stayed at the company, the lower the level of satisfaction', which indicates that the company may be lacking in providing long term goals or visions. Being invloved in a lot of projects is also quite highly correlated to employees leaving. However, since long working hours actually have not much correlation with attrition, we can also infer that being invloved in too many tasks and being disorganized and distracted causes lower satisfactory level than simply long working hours. 
 
 
-### 2. Cluster Analysis and Segmentation
+# 2. Cluster Analysis and Segmentation
 
-<<<<<<< HEAD
-2.1 Select segmentation variables and methods
-=======
 ## 2.1 (1st try) Select segmentation variables and methods
->>>>>>> 465f19eb18a8b1893134b768a8dcd94d3ad8c75b
 
 We use all the variables except "Whether the employee has left." We use Euclidean distance.
 
-```{r setupcluster, echo=TRUE, tidy=TRUE}
+```{r, echo=TRUE, tidy=TRUE}
 segmentation_attributes_used = c(1:6,8:19)
 profile_attributes_used = c(1:19) 
 numb_clusters_used = 5
@@ -135,7 +136,6 @@ profile_attributes_used <- intersect(profile_attributes_used, 1:ncol(ProjectData
 
 ProjectData_segment <- ProjectDataFactor_scaled[,segmentation_attributes_used]
 ProjectData_profile <- ProjectDataFactor_scaled[,profile_attributes_used]
-
 ```
 
 Here are the differences between the observations using the distance metric we selected:
@@ -150,11 +150,7 @@ iprint.df(round(euclidean_pairwise,2))
 ```
 
 
-<<<<<<< HEAD
-2.2 Visualize Pair-wise Distances
-=======
 ## 2.2 (1st try) Visualize Pair-wise Distances
->>>>>>> 465f19eb18a8b1893134b768a8dcd94d3ad8c75b
 
 We can see the histogram of, say, the first 2 variables.
 
@@ -172,19 +168,17 @@ qplot(as.vector(Pairwise_Distances), xlab="Histogram of all pairwise Distances b
 ```
 
 
-<<<<<<< HEAD
-2.3 Number of Segments
-=======
 ## 2.3 (1st try) Number of Segments
->>>>>>> 465f19eb18a8b1893134b768a8dcd94d3ad8c75b
 
-Let's use Hierarchical Clustering methods. It may be useful to see the dendrogram from , to have a quick idea of how the data may be segmented and how many segments there may be. Here is the dendrogram for our data:
+Let's use Hierarchical Clustering methods. It may be useful to see the dendrogram from, to have a quick idea of how the data may be segmented and how many segments there may be. Here is the dendrogram for our data:
 
 ```{r}
 Hierarchical_Cluster_distances <- dist(ProjectData_segment, method=distance_used)
 Hierarchical_Cluster <- hclust(Hierarchical_Cluster_distances, method=hclust_method)
 # Display dendogram
 iplot.dendrogram(Hierarchical_Cluster)
+# TODO: Draw dendogram with red borders around the 3 clusters
+#rect.hclust(Hierarchical_Cluster, k=numb_clusters_used, border="red")
 ```
 
 We can also plot the "distances" traveled before we need to merge any of the lower and smaller in size clusters into larger ones - the heights of the tree branches that link the clusters as we traverse the tree from its leaves to its root. If we have n observations, this plot has n-1 numbers, we see the first 20 here.
@@ -196,10 +190,10 @@ colnames(df1) <- c("distances","index")
 iplot.df(melt(head(df1, 20), id="index"), xlab="Number of Components")
 ```
 
-For now let's consider the 5-segments solution. We can also see the segment each observation (respondent in this case) belongs to for the first 20 people:
+For now let's consider the 4-segments solution. We can also see the segment each observation (respondent in this case) belongs to for the first 20 people:
 
 ```{r}
-cluster_memberships_hclust <- as.vector(cutree(Hierarchical_Cluster, 5))
+cluster_memberships_hclust <- as.vector(cutree(Hierarchical_Cluster, 4))
 cluster_ids_hclust = unique(cluster_memberships_hclust)
 
 ProjectData_with_hclust_membership <- cbind(1:length(cluster_memberships_hclust),cluster_memberships_hclust)
@@ -208,17 +202,29 @@ colnames(ProjectData_with_hclust_membership)<-c("Observation Number","Cluster_Me
 knitr::kable(round(head(ProjectData_with_hclust_membership, 20), 2))
 ```
 
-## 2.5 (1st try) Profile and interpret the segments
+## 2.4 (1st try) Profile and interpret the segments
 
 Having decided how many clusters to use, we would like to get a better understanding of who the customers in those clusters are and interpret the segments. 
+
+Let's see first how many observations we have in each segment, for the segments we selected above:
+
+```{r}
+cluster_memberships <- cluster_memberships_hclust
+cluster_ids <-  cluster_ids_hclust
+
+cluster_size = NULL
+for (i in sort(unique(cluster_memberships))){
+  cluster_size = c(cluster_size,sum(cluster_memberships == i))
+  }
+cluster_size = matrix(cluster_size, nrow=1)
+colnames(cluster_size) <- paste("Segment", 1:length(cluster_size), sep=" ")
+rownames(cluster_size) <- "Number of Obs."
+iprint.df(cluster_size, scale=TRUE)
+```
 
 The average values of our data for the total population as well as within each customer segment are:
 
 ```{r}
-cluster_memberships <- cluster_memberships_hclust
-cluster_ids <-  cluster_ids_hclust  
-
-# SAVE THE DATA in the cluster file
 NewData = matrix(cluster_memberships,ncol=1)
 
 population_average = matrix(apply(ProjectData_profile, 2, mean), ncol=1)
@@ -232,19 +238,7 @@ cluster.profile <- cbind (population_average,Cluster_Profile_mean)
 knitr::kable(round(cluster.profile, 2))
 ```
 
-we can measure the ratios of the average for each cluster to the average of the population and subtract 1 (e.g. `avg(cluster)` `/` `avg(population)` `- 1`) and explore a matrix as the following one:
-
-```{r}
-population_average_matrix <- population_average[,"Population",drop=F] %*% matrix(rep(1,ncol(Cluster_Profile_mean)),nrow=1)
-cluster_profile_ratios <- (ifelse(population_average_matrix==0, 0,Cluster_Profile_mean/population_average_matrix-1))
-colnames(cluster_profile_ratios) <- paste("Segment", 1:ncol(cluster_profile_ratios), sep=" ")
-rownames(cluster_profile_ratios) <- colnames(ProjectData)[profile_attributes_used]
-## printing the result in a clean-slate table
-iprint.df(round(cluster_profile_ratios, 2))
-```
-
 The segment profile looks to depend too much on department.
-
 Let's try the analysis again excluding department information.
 
 
@@ -252,9 +246,9 @@ Let's try the analysis again excluding department information.
 
 We use all the variables except "Whether the employee has left." and department. We use Euclidean distance.
 
-```{r setupcluster2, echo=TRUE, tidy=TRUE}
-segmentation_attributes_used = c(1:6,9)
-profile_attributes_used = c(1:9)
+```{r, echo=TRUE, tidy=TRUE}
+segmentation_attributes_used = c(1:6,8:9)
+profile_attributes_used = c(1:19)
 numb_clusters_used = 5
 profile_with = "hclust"
 distance_used = "euclidean"
@@ -267,53 +261,22 @@ profile_attributes_used <- intersect(profile_attributes_used, 1:ncol(ProjectData
 
 ProjectData_segment <- ProjectDataFactor_scaled[,segmentation_attributes_used]
 ProjectData_profile <- ProjectDataFactor_scaled[,profile_attributes_used]
-
-```
-
-Here are the differences between the observations using the distance metric we selected:
-
-```{r}
-euclidean_pairwise <- as.matrix(dist(head(ProjectData_segment, 10), method="euclidean"))
-euclidean_pairwise <- euclidean_pairwise*lower.tri(euclidean_pairwise) + euclidean_pairwise*diag(euclidean_pairwise) + 10e10*upper.tri(euclidean_pairwise)
-euclidean_pairwise[euclidean_pairwise==10e10] <- NA
-rownames(euclidean_pairwise) <- colnames(euclidean_pairwise) <- sprintf("Obs.%02d", 1:10)
-
-iprint.df(round(euclidean_pairwise,2))
 ```
 
 
-## 2.2 (2ns try) Visualize Pair-wise Distances
+## 2.2 (2nd try) Visualize Pair-wise Distances
 
-We can see the histogram of, say, the first 2 variables.
-
-```{r}
-do.call(grid.arrange, lapply(1:2, function(n) {
-  qplot(ProjectData_segment[, n], xlab=paste("Histogram of Variable", n), ylab="Frequency", binwidth=0.2)
-}))
-```
-
-or the histogram of all pairwise distances for the `r distance_used` distance:
-
-```{r}
-Pairwise_Distances <- dist(ProjectData_segment, method = distance_used) 
-qplot(as.vector(Pairwise_Distances), xlab="Histogram of all pairwise Distances between observtions", ylab="Frequency", binwidth=0.2)
-```
+Let us skip this subsection for the 2nd try.
 
 
 ## 2.3 (2nd try) Number of Segments
 
-Let's use Hierarchical Clustering methods. It may be useful to see the dendrogram from , to have a quick idea of how the data may be segmented and how many segments there may be. Here is the dendrogram for our data:
+Let's plot the "distances" traveled before we need to merge any of the lower and smaller in size clusters into larger ones.
 
 ```{r}
 Hierarchical_Cluster_distances <- dist(ProjectData_segment, method=distance_used)
 Hierarchical_Cluster <- hclust(Hierarchical_Cluster_distances, method=hclust_method)
-# Display dendogram
-iplot.dendrogram(Hierarchical_Cluster)
-```
 
-We can also plot the "distances" traveled before we need to merge any of the lower and smaller in size clusters into larger ones - the heights of the tree branches that link the clusters as we traverse the tree from its leaves to its root. If we have n observations, this plot has n-1 numbers, we see the first 20 here.
-
-```{r}
 num <- nrow(ProjectData) - 1
 df1 <- cbind(as.data.frame(Hierarchical_Cluster$height[length(Hierarchical_Cluster$height):1]), c(1:num))
 colnames(df1) <- c("distances","index")
@@ -332,17 +295,29 @@ colnames(ProjectData_with_hclust_membership)<-c("Observation Number","Cluster_Me
 knitr::kable(round(head(ProjectData_with_hclust_membership, 20), 2))
 ```
 
-## 2.5 (2nd try) Profile and interpret the segments
+## 2.4 (2nd try) Profile and interpret the segments
 
-Having decided how many clusters to use, we would like to get a better understanding of who the customers in those clusters are and interpret the segments. 
+Having decided how many clusters to use, we would like to get a better understanding of who the customers in those clusters are and interpret the segments.
+
+Let's see first how many observations we have in each segment, for the segments we selected above:
+
+```{r}
+cluster_memberships <- cluster_memberships_hclust
+cluster_ids <-  cluster_ids_hclust
+
+cluster_size = NULL
+for (i in sort(unique(cluster_memberships))){
+  cluster_size = c(cluster_size,sum(cluster_memberships == i))
+  }
+cluster_size = matrix(cluster_size, nrow=1)
+colnames(cluster_size) <- paste("Segment", 1:length(cluster_size), sep=" ")
+rownames(cluster_size) <- "Number of Obs."
+iprint.df(cluster_size, scale=TRUE)
+```
 
 The average values of our data for the total population as well as within each customer segment are:
 
 ```{r}
-cluster_memberships <- cluster_memberships_hclust
-cluster_ids <-  cluster_ids_hclust  
-
-# SAVE THE DATA in the cluster file
 NewData = matrix(cluster_memberships,ncol=1)
 
 population_average = matrix(apply(ProjectData_profile, 2, mean), ncol=1)
@@ -356,37 +331,188 @@ cluster.profile <- cbind (population_average,Cluster_Profile_mean)
 knitr::kable(round(cluster.profile, 2))
 ```
 
-we can measure the ratios of the average for each cluster to the average of the population and subtract 1 (e.g. `avg(cluster)` `/` `avg(population)` `- 1`) and explore a matrix as the following one:
+Everyone in the Segment 5 had work accident, which does not look good segmentations.
+Let's try the analysis again excluding work accident information.
+
+
+## 2.1 (3rd try) Select segmentation variables and methods
+
+We use all the variables except "Whether the employee has left," department, and work accident. We use Euclidean distance.
+
+```{r, echo=TRUE, tidy=TRUE}
+segmentation_attributes_used = c(1:5,8:9)
+profile_attributes_used = c(1:19)
+numb_clusters_used = 4
+profile_with = "hclust"
+distance_used = "euclidean"
+hclust_method = "ward.D"
+```
 
 ```{r}
-population_average_matrix <- population_average[,"Population",drop=F] %*% matrix(rep(1,ncol(Cluster_Profile_mean)),nrow=1)
-cluster_profile_ratios <- (ifelse(population_average_matrix==0, 0,Cluster_Profile_mean/population_average_matrix-1))
-colnames(cluster_profile_ratios) <- paste("Segment", 1:ncol(cluster_profile_ratios), sep=" ")
-rownames(cluster_profile_ratios) <- colnames(ProjectData)[profile_attributes_used]
-## printing the result in a clean-slate table
-iprint.df(round(cluster_profile_ratios, 2))
+segmentation_attributes_used <- intersect(segmentation_attributes_used, 1:ncol(ProjectDataFactor))
+profile_attributes_used <- intersect(profile_attributes_used, 1:ncol(ProjectDataFactor))
+
+ProjectData_segment <- ProjectDataFactor_scaled[,segmentation_attributes_used]
+ProjectData_profile <- ProjectDataFactor_scaled[,profile_attributes_used]
 ```
 
 
+## 2.2 (3rd try) Visualize Pair-wise Distances
+
+Let us skip this subsection for the 3rd try.
 
 
-<<<<<<< HEAD
-2.4 Profile and interpret the segments
+## 2.3 (3rd try) Number of Segments
 
-2.6 Robustness analysis
+Let's plot the "distances" traveled before we need to merge any of the lower and smaller in size clusters into larger ones.
+
+```{r}
+Hierarchical_Cluster_distances <- dist(ProjectData_segment, method=distance_used)
+Hierarchical_Cluster <- hclust(Hierarchical_Cluster_distances, method=hclust_method)
+
+num <- nrow(ProjectData) - 1
+df1 <- cbind(as.data.frame(Hierarchical_Cluster$height[length(Hierarchical_Cluster$height):1]), c(1:num))
+colnames(df1) <- c("distances","index")
+iplot.df(melt(head(df1, 20), id="index"), xlab="Number of Components")
+```
+
+For now let's consider the 4-segments solution. We can also see the segment each observation (respondent in this case) belongs to for the first 20 people:
+
+```{r}
+cluster_memberships_hclust <- as.vector(cutree(Hierarchical_Cluster, 4))
+cluster_ids_hclust = unique(cluster_memberships_hclust)
+
+ProjectData_with_hclust_membership <- cbind(1:length(cluster_memberships_hclust),cluster_memberships_hclust)
+colnames(ProjectData_with_hclust_membership)<-c("Observation Number","Cluster_Membership")
+
+knitr::kable(round(head(ProjectData_with_hclust_membership, 20), 2))
+```
+
+## 2.4 (3rd try) Profile and interpret the segments
+
+Having decided how many clusters to use, we would like to get a better understanding of who the customers in those clusters are and interpret the segments.
+
+Let's see first how many observations we have in each segment, for the segments we selected above:
+
+```{r}
+cluster_memberships <- cluster_memberships_hclust
+cluster_ids <-  cluster_ids_hclust
+
+cluster_size = NULL
+for (i in sort(unique(cluster_memberships))){
+  cluster_size = c(cluster_size,sum(cluster_memberships == i))
+  }
+cluster_size = matrix(cluster_size, nrow=1)
+colnames(cluster_size) <- paste("Segment", 1:length(cluster_size), sep=" ")
+rownames(cluster_size) <- "Number of Obs."
+iprint.df(cluster_size, scale=TRUE)
+```
+
+The average values of our data for the total population as well as within each customer segment are:
+
+```{r}
+NewData = matrix(cluster_memberships,ncol=1)
+
+population_average = matrix(apply(ProjectData_profile, 2, mean), ncol=1)
+colnames(population_average) <- "Population"
+Cluster_Profile_mean <- sapply(sort(cluster_ids), function(i) apply(ProjectData_profile[(cluster_memberships==i), ], 2, mean))
+if (ncol(ProjectData_profile) <2)
+  Cluster_Profile_mean=t(Cluster_Profile_mean)
+colnames(Cluster_Profile_mean) <- paste("Segment", 1:length(cluster_ids), sep=" ")
+cluster.profile <- cbind (population_average,Cluster_Profile_mean)
+
+knitr::kable(round(cluster.profile, 2))
+```
 
 
-=======
->>>>>>> 465f19eb18a8b1893134b768a8dcd94d3ad8c75b
+# 2.5 Implications
 
-### 3. Drivers of Leaving Company
 
-3.1 Classification tree
-3.2 Profit curve
+# 3. Drivers of Leaving Company
 
-### 4. Business Decisions
+## 3.1 Classification tree
 
-Following the analysis above, several business decisions can be made. 
+```{r setupclassification, echo=TRUE, tidy=TRUE}
+dependent_variable = 7
+independent_variables = c(1:5,8:9)
+
+Probability_Threshold = 0.5
+
+estimation_data_percent = 80
+validation_data_percent = 10
+
+random_sampling = 0
+
+# Tree (CART) complexity control cp (e.g. 0.001 to 0.02, depending on the data)
+CART_cp = 0.01
+
+# the minimum size of a segment for the analysis to be done only for that segment
+min_segment = 100
+```
+
+```{r}
+dependent_variable = unique(sapply(dependent_variable,function(i) min(ncol(ProjectDataFactor_scaled), max(i,1))))
+independent_variables = unique(sapply(independent_variables,function(i) min(ncol(ProjectDataFactor_scaled), max(i,1))))
+
+#Profit_Matrix = matrix(c(actual_1_predict_1, actual_0_predict_1, actual_1_predict_0, actual_0_predict_0), ncol=2)
+#colnames(Profit_Matrix)<- c("Predict 1", "Predict 0")
+#rownames(Profit_Matrix) <- c("Actual 1", "Actual 0")
+test_data_percent = 100 - estimation_data_percent - validation_data_percent
+CART_control = rpart.control(cp = CART_cp)
+```
+
+```{r}
+# First we split the data in estimation, validation, and test
+
+if (random_sampling){
+  estimation_data_ids=sample.int(nrow(ProjectDataFactor_scaled),floor(estimation_data_percent*nrow(ProjectDataFactor_scaled)/100))
+  non_estimation_data = setdiff(1:nrow(ProjectDataFactor_scaled),estimation_data_ids)
+  validation_data_ids=non_estimation_data[sample.int(length(non_estimation_data), floor(validation_data_percent/(validation_data_percent+test_data_percent)*length(non_estimation_data)))]
+  } else {
+    estimation_data_ids=1:floor(estimation_data_percent*nrow(ProjectDataFactor_scaled)/100)
+    non_estimation_data = setdiff(1:nrow(ProjectDataFactor_scaled),estimation_data_ids)
+    validation_data_ids = (tail(estimation_data_ids,1)+1):(tail(estimation_data_ids,1) + floor(validation_data_percent/(validation_data_percent+test_data_percent)*length(non_estimation_data)))
+    }
+
+test_data_ids = setdiff(1:nrow(ProjectDataFactor_scaled), union(estimation_data_ids,validation_data_ids))
+
+estimation_data=ProjectDataFactor_scaled[estimation_data_ids,]
+validation_data=ProjectDataFactor_scaled[validation_data_ids,]
+test_data=ProjectDataFactor_scaled[test_data_ids,]
+```
+
+```{r}
+# just name the variables numerically so that they look ok on the tree plots
+independent_variables_nolabel = paste("IV", 1:length(independent_variables), sep="")
+
+estimation_data_nolabel = cbind(estimation_data[,dependent_variable], estimation_data[,independent_variables])
+colnames(estimation_data_nolabel)<- c(colnames(estimation_data)[dependent_variable],independent_variables_nolabel)
+
+validation_data_nolabel = cbind(validation_data[,dependent_variable], validation_data[,independent_variables])
+colnames(validation_data_nolabel)<- c(dependent_variable,independent_variables_nolabel)
+
+test_data_nolabel = cbind(test_data[,dependent_variable], test_data[,independent_variables])
+colnames(test_data_nolabel)<- c(dependent_variable,independent_variables_nolabel)
+
+estimation_data_nolabel = data.frame(estimation_data_nolabel)
+validation_data_nolabel = data.frame(validation_data_nolabel)
+test_data_nolabel = data.frame(test_data_nolabel)
+
+estimation_data = data.frame(estimation_data)
+validation_data = data.frame(validation_data)
+test_data = data.frame(test_data)
+
+formula=paste(colnames(estimation_data)[dependent_variable],paste(Reduce(paste,sapply(head(independent_variables_nolabel,-1), function(i) paste(i,"+",sep=""))),tail(independent_variables_nolabel,1),sep=""),sep="~")
+CART_tree<-rpart(formula, data= estimation_data_nolabel,method="class", control=CART_control)
+
+rpart.plot(CART_tree, box.palette="OrBu", type=3, extra=1, fallen.leaves=F, branch.lty=3)
+```
+
+
+# 4. Business Decisions
+
+
+# 5. Future Work
 
 First, companies can implement policies to control attrition rates, by managing the variables that have a high correlation with employees leaving. For example, companies could work to increase the satisfactory level of employees, especially in the variables that lead to low satisfactory level. To encourage the employees to stay longer, companies could share clear long term visions of the company to help employees envision their future together with the company. Companies could also implement strict working policies where employees would be restricted from joining above a certain number of projects, allowing them to deeply focus on only a few projects and therefore find more meaningful value and satisfaction. 
 
@@ -394,4 +520,4 @@ Second, companies can use the prediction model to retain the high performing emp
 END.
 
 
-## Conclusion 
+## Conclusion
