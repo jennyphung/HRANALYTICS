@@ -16,6 +16,7 @@ knitr::opts_chunk$set(echo = TRUE)
 The objective of this analytical report is to help companies identify good employees who are at risk of leaving the company. With this information, companies can allocate their finances and resources on in areas that can help in retaining good employees.  
 
 
+
 ## Analysis Process 
 
 First, we will analyze and visualize the data to get a basic understanding of the data inhand (*Human Resources Analytics by Ludovic Benistant from kaggle.com*). After obtaining a basic understanding of the data, we will check the correlation of the factors to identify and interpret the key factors that drive employees to leave. 
