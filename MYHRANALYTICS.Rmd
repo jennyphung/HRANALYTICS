@@ -392,6 +392,8 @@ knitr::kable(round(head(ProjectData_with_hclust_membership, 20), 2))
 
 Having decided how many clusters to use, we would like to get a better understanding of who the customers in those clusters are and interpret the segments.
 
+
+
 Let's see first how many observations we have in each segment, for the segments we selected above:
 
 ```{r}
