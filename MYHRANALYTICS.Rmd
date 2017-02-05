@@ -12,19 +12,22 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Objective
+## Objective
 
 The objective of this analytical report is to help companies identify good employees who are at risk of leaving the company. With this information, companies can allocate their finances and resources on in areas that can help in retaining good employees.  
 
+## Analysis Process 
 
-# Analysis Process 
+1. Data check and Visualization
+First, we will analyze and visualize the data to get a basic understanding of the data inhand (*Human Resources Analytics by Ludovic Benistant from kaggle.com*). After obtaining a basic understanding of the data, we will check the correlation between the give attributes and interpret the data.
 
-First, we will analyze and visualize the data to get a basic understanding of the data inhand (*Human Resources Analytics by Ludovic Benistant from kaggle.com*). After obtaining a basic understanding of the data, we will check the correlation of the factors to identify and interpret the key factors that drive employees to leave. 
+2. Cluster analysis and Segmentation
+Second, we will segment the entire employees by using the cluster method to segement and profile the given employee pool,and observe if any certain segment of employees have a higher attrition rate than others.
 
-Second, we will segment the entire employees by using the cluster method to observe which cluster of employees have a higher possbility of leaving. 
+3. Key drivers analysis
+We will also try to analyze the key factors that are more influential in driving employees to leave their company using the classification model (tree induction).
 
-Finally, we will bucket the employees (excluding the ones who have stayed) across two dimensions, performance and risk of leaving, in order to predict and identify the employees companies generally wish to retain even at a higher cost - high performing employees with high risk of leaving (and maybe even identify the low performing employees with low possiblity of leaving). This will help the company to target and invest in their human resources and reduce the risk and negative impact of losing high performing employees.
-
+Finally, we will recommend several business decisions based on our data analysis from above to help the company target and invest in their human resources effectively and reduce the risk and negative impact of losing high performing employees.
 
 ```{r setuplibraries, echo=FALSE, message=FALSE}
 suppressWarnings(source("../INSEADAnalytics/AnalyticsLibraries/library.R"))
@@ -36,10 +39,9 @@ options(knitr.kable.NA = '')
 ```
 
 
-# 1. Data check and Visualisation
+## 1. Data check and Visualisation
 
-
-## 1.1 Load and Explore the data
+### 1.1 Load and Explore the data
 
 First, let's load the data to use.
 
@@ -49,7 +51,6 @@ ProjectData = data.matrix(ProjectData)
 ```
 
 Description of the data
-*Can we slightly rename the titles of the data in the excel file - or is it too complicated now?*
 
 1. Employee satisfaction level
 2. Last evaluation
@@ -83,7 +84,7 @@ knitr::kable(round(my_summary(ProjectDataFactor), 2))
 ```
 
 
-## 1.2 Scale the data
+### 1.2 Scale the data
 
 Here, we are standardizing the data in order to avoid having the problem of the result being driven by a few relatively large values. We will scale the data between 0 and 1. 
 
@@ -98,23 +99,23 @@ knitr::kable(round(my_summary(ProjectDataFactor_scaled), 2))
 ```
 
 
-## 1.3 Check Correlations
+### 1.3 Check Correlations
 
-The simplest way to have a first look at a dataset is to check the correlation. By doing this, we can easily see which factors have a high positive/negative correlation with leaving employees. This is different from a causality, therefore we cannot conclude that a highly correlated factor (independent variables) leads an employee to leave (dependent variable). Also, if some of the factors (independent variables) are highly correlated with each other, we could also consider to group these attributes together.
+The simplest way to have a first look at a dataset is to check the correlation. By doing this, we can easily see which factors have a high positive/negative correlation with leaving employees. This is different from a causality, therefore we cannot conclude that a highly correlated factor (independent variables) leads an employee to leave (dependent variable). Also, if some of the factors (independent variables) are highly correlated with each other, we could consider to group these attributes together.  
 
 ```{r echo=FALSE, tidy=TRUE}
 thecorr = round(cor(ProjectDataFactor_scaled),2)
 iprint.df(round(thecorr,2))
 ```
 
-The most significant variable is 'Satisfaction level', which is strongly negatively correlated with employees leaving, (*input number*), which is quite obvious. The satisfaction level is also negatively correlated with time spent at the company, and number of projects. This can be interpreted as 'the longer the employee has stayed at the company, the lower the level of satisfaction', which indicates that the company may be lacking in providing long term goals or visions. Being invloved in a lot of projects is also quite highly correlated to employees leaving. However, since long working hours actually have not much correlation with attrition, we can also infer that being invloved in too many tasks and being disorganized and distracted causes lower satisfactory level than simply long working hours. 
+The most significant variable to look at is 'Satisfaction level', which is strongly negatively correlated with employees leaving. What influences the satisfaction level is not clearly indicated in the data description, but we can at least look at the correlation between Satisfaction level and the other variables to see what other variables could be related to Satisfaction level. The Satisfaction level is also negatively correlated with time spent at the company, and number of projects. This can be interpreted as 'the longer the employee has stayed at the company, the lower the level of satisfaction', which indicates that the company may be lacking in providing long term goals or visions. Being invloved in a lot of projects is also quite highly correlated to employees leaving. However, since long working hours do not have a significant correlation with attrition, we can also infer that being invloved in too many tasks, i.e. being disorganized and distracted, causes lower satisfactory level than simply having longer working hours. 
 
+## 2. Cluster Analysis and Segmentation
 
-# 2. Cluster Analysis and Segmentation
+### Test #1
+### 2.1: Select segmentation variables and methods
 
-## 2.1 (1st try) Select segmentation variables and methods
-
-We use all the variables except "Whether the employee has left." We use Euclidean distance.
+We will segement the employees including all the variables except the variable "Whether employee has left." We will use Euclidean distance.
 
 ```{r, echo=TRUE, tidy=TRUE}
 segmentation_attributes_used = c(1:6,8:19)
@@ -133,7 +134,7 @@ ProjectData_segment <- ProjectDataFactor_scaled[,segmentation_attributes_used]
 ProjectData_profile <- ProjectDataFactor_scaled[,profile_attributes_used]
 ```
 
-Here are the differences between the observations using the distance metric we selected:
+Here are the differences between the observations using the distance metric we selected (euclidean):
 
 ```{r}
 euclidean_pairwise <- as.matrix(dist(head(ProjectData_segment, 10), method="euclidean"))
@@ -145,9 +146,9 @@ iprint.df(round(euclidean_pairwise,2))
 ```
 
 
-## 2.2 (1st try) Visualize Pair-wise Distances
+### 2.2 Visualize Pair-wise Distances
 
-We can see the histogram of, say, the first 2 variables.
+Below is the histogram of, say, the first 2 variables.
 
 ```{r}
 do.call(grid.arrange, lapply(1:2, function(n) {
@@ -162,10 +163,11 @@ Pairwise_Distances <- dist(ProjectData_segment, method = distance_used)
 qplot(as.vector(Pairwise_Distances), xlab="Histogram of all pairwise Distances between observtions", ylab="Frequency", binwidth=0.2)
 ```
 
+The mountain and valley in our histogram shows us that there is a high possibility of multiple segments within the employees. We will try to identify these segments in the next part of our analysis.
 
-## 2.3 (1st try) Number of Segments
+### 2.3 Number of Segments
 
-Let's use Hierarchical Clustering methods. It may be useful to see the dendrogram from, to have a quick idea of how the data may be segmented and how many segments there may be. Here is the dendrogram for our data:
+Let's use the Hierarchical Clustering methods. It may be useful to see the dendrogram from, to have a quick idea of how the data may be segmented and how many segments there may be. Here is the dendrogram for our data:
 
 ```{r}
 Hierarchical_Cluster_distances <- dist(ProjectData_segment, method=distance_used)
@@ -174,7 +176,7 @@ Hierarchical_Cluster <- hclust(Hierarchical_Cluster_distances, method=hclust_met
 iplot.dendrogram(Hierarchical_Cluster)
 ```
 
-We can also plot the "distances" traveled before we need to merge any of the lower and smaller in size clusters into larger ones - the heights of the tree branches that link the clusters as we traverse the tree from its leaves to its root. If we have n observations, this plot has n-1 numbers, we see the first 20 here.
+We can also plot the "distances" traveled before we merge any of the lower and smaller in size clusters into larger ones - the heights of the tree branches that link the clusters as we traverse the tree from its leaves to its root. If we have n observations, the plot will have n-1 numbers. We can see the first 20 here.
 
 ```{r}
 num <- nrow(ProjectData) - 1
@@ -183,7 +185,7 @@ colnames(df1) <- c("distances","index")
 iplot.df(melt(head(df1, 20), id="index"), xlab="Number of Components")
 ```
 
-For now let's consider the 4-segments solution. We can also see the segment each observation (respondent in this case) belongs to for the first 20 people:
+For now, let's consider the 4-segments solution. We can also see the segment each observation (respondent in this case) belongs to for the first 20 people:
 
 ```{r}
 cluster_memberships_hclust <- as.vector(cutree(Hierarchical_Cluster, 4))
@@ -195,7 +197,7 @@ colnames(ProjectData_with_hclust_membership)<-c("Observation Number","Cluster_Me
 knitr::kable(round(head(ProjectData_with_hclust_membership, 20), 2))
 ```
 
-## 2.4 (1st try) Profile and interpret the segments
+### 2.4 Profile and interpret the segments
 
 Having decided how many clusters to use, we would like to get a better understanding of who the customers in those clusters are and interpret the segments. 
 
@@ -231,13 +233,12 @@ cluster.profile <- cbind (population_average,Cluster_Profile_mean)
 knitr::kable(round(cluster.profile, 2))
 ```
 
-The segment profile looks to depend too much on department.
-Let's try the analysis again excluding department information.
+Looking at the data, we realized our segments have been divided highly depending on the department employees belong to (The employees from same departments were all grouped in the same segment). Therefore, we will re-segment our data excluding departments, and only use the 'departments' for profiling.
 
+### Test #2
+### 2.1 Select segmentation variables and methods
 
-## 2.1 (2nd try) Select segmentation variables and methods
-
-We use all the variables except "Whether the employee has left." and department. We use Euclidean distance.
+This is our 2nd try on segmentation - using the same method as above, but now with the variable 'departments' removed as well as "Whether employee has left". We will use Euclidean distance.
 
 ```{r, echo=TRUE, tidy=TRUE}
 segmentation_attributes_used = c(1:6,8:9)
@@ -257,14 +258,13 @@ ProjectData_profile <- ProjectDataFactor_scaled[,profile_attributes_used]
 ```
 
 
-## 2.2 (2nd try) Visualize Pair-wise Distances
+### 2.2 Visualize Pair-wise Distances
 
-Let us skip this subsection for the 2nd try.
+We will skip this subsection for our 2nd try.
 
+### 2.3 Number of Segments
 
-## 2.3 (2nd try) Number of Segments
-
-Let's plot the "distances" traveled before we need to merge any of the lower and smaller in size clusters into larger ones.
+Let's plot the "distances" between clusters before we merge any of the lower and smaller sized clusters into larger ones.
 
 ```{r}
 Hierarchical_Cluster_distances <- dist(ProjectData_segment, method=distance_used)
@@ -276,7 +276,7 @@ colnames(df1) <- c("distances","index")
 iplot.df(melt(head(df1, 20), id="index"), xlab="Number of Components")
 ```
 
-For now let's consider the 5-segments solution. We can also see the segment each observation (respondent in this case) belongs to for the first 20 people:
+For now, we will choose 5 segments. We can see the segment each observation (respondent in this case) belongs to for the first 20 people:
 
 ```{r}
 cluster_memberships_hclust <- as.vector(cutree(Hierarchical_Cluster, 5))
@@ -288,9 +288,9 @@ colnames(ProjectData_with_hclust_membership)<-c("Observation Number","Cluster_Me
 knitr::kable(round(head(ProjectData_with_hclust_membership, 20), 2))
 ```
 
-## 2.4 (2nd try) Profile and interpret the segments
+### 2.4 Profile and interpret the segments
 
-Having decided how many clusters to use, we would like to get a better understanding of who the customers in those clusters are and interpret the segments.
+Having decided how many clusters to use, we would like to have a better understanding of who the customers in those clusters are and interpret the segments.
 
 Let's see first how many observations we have in each segment, for the segments we selected above:
 
@@ -324,13 +324,14 @@ cluster.profile <- cbind (population_average,Cluster_Profile_mean)
 knitr::kable(round(cluster.profile, 2))
 ```
 
-Everyone in the Segment 5 had work accident, which does not look good segmentations.
-Let's try the analysis again excluding work accident information.
+Segment 1 to 4 has quite clear differentiation among segments, and we were able to profile them as 'Quitters', 'Pampered Loyals', 'The Burned-outs', and 'Neglected Loyals'. However, everyone in Segment 5 has had a work accident (coefficient 1), which is a variable we consider not to be much meaningful in exploring who and how to retain.
+Therefore, we will redo the analysis again excluding work accident as a variable.
 
 
-## 2.1 (3rd try) Select segmentation variables and methods
+### Test #3
+### 2.1 Select segmentation variables and methods
 
-We use all the variables except "Whether the employee has left," department, and work accident. We use Euclidean distance.
+We will now use the variables except 'Whether employee has left','Department', and 'Work accident'. We will use Euclidean distance, just like before.
 
 ```{r, echo=TRUE, tidy=TRUE}
 segmentation_attributes_used = c(1:5,8:9)
@@ -350,14 +351,13 @@ ProjectData_profile <- ProjectDataFactor_scaled[,profile_attributes_used]
 ```
 
 
-## 2.2 (3rd try) Visualize Pair-wise Distances
+### 2.2 Visualize Pair-wise Distances
 
-Let us skip this subsection for the 3rd try.
+We will skip this subsection for our 3rd try.
 
+### 2.3 Number of Segments
 
-## 2.3 (3rd try) Number of Segments
-
-Let's plot the "distances" traveled before we need to merge any of the lower and smaller in size clusters into larger ones.
+Let's plot the "distances" between clusters before we merge any of the lower and smaller sized clusters into larger ones.
 
 ```{r}
 Hierarchical_Cluster_distances <- dist(ProjectData_segment, method=distance_used)
@@ -369,7 +369,7 @@ colnames(df1) <- c("distances","index")
 iplot.df(melt(head(df1, 20), id="index"), xlab="Number of Components")
 ```
 
-For now let's consider the 4-segments solution. We can also see the segment each observation (respondent in this case) belongs to for the first 20 people:
+The appropriate number of segments is 4, with the distance between clusters dropping drastically after 4. Below are the segments assigned to each employee, for the first 20 employees (observations).
 
 ```{r}
 cluster_memberships_hclust <- as.vector(cutree(Hierarchical_Cluster, 4))
@@ -381,11 +381,11 @@ colnames(ProjectData_with_hclust_membership)<-c("Observation Number","Cluster_Me
 knitr::kable(round(head(ProjectData_with_hclust_membership, 20), 2))
 ```
 
-## 2.4 (3rd try) Profile and interpret the segments
+### 2.4 Profile and interpret the segments
 
-Having decided how many clusters to use, we would like to get a better understanding of who the customers in those clusters are and interpret the segments.
+The number and segmentation of the clustuers seem reasonable. Now, in order to get a better understanding of who the employyes in those clusters are, we will attempt to profile and interpret the segments using the all the variables (attributes) we originally had, including the variables we excluded for segmentation.
 
-Let's see first how many observations we have in each segment, for the segments we selected above:
+Let's first see how many observations we have in each segment, for the segments we selected above:
 
 ```{r}
 cluster_memberships <- cluster_memberships_hclust
@@ -401,7 +401,7 @@ rownames(cluster_size) <- "Number of Obs."
 iprint.df(cluster_size, scale=TRUE)
 ```
 
-The average values of our data for the total population as well as within each customer segment are:
+The average values of our data for the total population as well as within each customer segment are as below:
 
 ```{r}
 NewData = matrix(cluster_memberships,ncol=1)
@@ -417,13 +417,18 @@ cluster.profile <- cbind (population_average,Cluster_Profile_mean)
 knitr::kable(round(cluster.profile, 2))
 ```
 
+### 2.5 Implications
 
-# 2.5 Implications
+Yonni
 
+## 3. Drivers of Leaving Company
 
-# 3. Drivers of Leaving Company
+Yonni
 
-## 3.1 Classification tree
+### 3.1 Classification tree
+
+Hiroko
+
 
 ```{r setupclassification, echo=TRUE, tidy=TRUE}
 dependent_variable = 7
@@ -503,16 +508,17 @@ CART_tree_large<-rpart(formula, data=estimation_data_nolabel, method="class", co
 rpart.plot(CART_tree_large, box.palette="OrBu", type=3, extra=1, fallen.leaves=F, branch.lty=3)
 ```
 
+=======
+Yonni
 
-# 4. Business Decisions
+## 4. Business Decisions
 
+Jenny
 
-# 5. Future Work
+## 5. Future Work
+
+*I started writing this below but feel free to add, change, or delete, since I don't know what will come in 3 and 4!
 
 First, companies can implement policies to control attrition rates, by managing the variables that have a high correlation with employees leaving. For example, companies could work to increase the satisfactory level of employees, especially in the variables that lead to low satisfactory level. To encourage the employees to stay longer, companies could share clear long term visions of the company to help employees envision their future together with the company. Companies could also implement strict working policies where employees would be restricted from joining above a certain number of projects, allowing them to deeply focus on only a few projects and therefore find more meaningful value and satisfaction. 
 
 Second, companies can use the prediction model to retain the high performing employees with high risk of leaving.
-END.
-
-
-## Conclusion
