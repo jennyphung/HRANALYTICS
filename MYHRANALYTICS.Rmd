@@ -14,7 +14,10 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Objective
 
-The objective of this analytical report is to help companies identify good employees who are at risk of leaving the company. With this information, companies can allocate their finances and resources on in areas that can help in retaining good employees.  
+When salary discussions are approaching, most companies face the same challenge; how to distribute the limited cash pie among employees. Different companies developed different methods and criteria towards this challenge, however, the goal is common for most of them: reward good employees who are likely to stay with the company for the long term. The first part of this equation is quite simple: identifying the good employees. Most companies maintain evaluation process that allows them to identify high preforming employees. The latter part, however, is trickier. How can companies predict who are the employees that are likely to leave? What are the characteristics of those high-risk employees?
+
+The goal of our analysis is to use big data analytics (~15,000 employee records) to identify groups of employees with high likelihood of leaving the company. Once these groups were identified we wish to understand the underlying drivers behind their attrition. With this kind of data in hand, companies can better allocate their resources and invest in employees in risk. As not fair as it may sound, investing resources in good employees with low likelihood to leave is a low ROI investment. 
+
 
 ## Analysis Process 
 
@@ -27,7 +30,8 @@ Second, we will segment the entire employees by using the cluster method to sege
 3. Key drivers analysis
 We will also try to analyze the key factors that are more influential in driving employees to leave their company using the classification model (tree induction).
 
-Finally, we will recommend several business decisions based on our data analysis from above to help the company target and invest in their human resources effectively and reduce the risk and negative impact of losing high performing employees.
+4. Finally, we will recommend several business decisions based on our data analysis from above to help the company target and invest in their human resources effectively and reduce the risk and negative impact of losing high performing employees.
+
 
 ```{r setuplibraries, echo=FALSE, message=FALSE}
 suppressWarnings(source("../INSEADAnalytics/AnalyticsLibraries/library.R"))
@@ -38,6 +42,7 @@ opts_chunk$set(echo=FALSE, fig.align="center", fig.width=10, fig.height=6.35, re
 options(knitr.kable.NA = '')
 ```
 
+-----
 
 ## 1. Data check and Visualisation
 
@@ -109,6 +114,8 @@ iprint.df(round(thecorr,2))
 ```
 
 The most significant variable to look at is 'Satisfaction level', which is strongly negatively correlated with employees leaving. What influences the satisfaction level is not clearly indicated in the data description, but we can at least look at the correlation between Satisfaction level and the other variables to see what other variables could be related to Satisfaction level. The Satisfaction level is also negatively correlated with time spent at the company, and number of projects. This can be interpreted as 'the longer the employee has stayed at the company, the lower the level of satisfaction', which indicates that the company may be lacking in providing long term goals or visions. Being invloved in a lot of projects is also quite highly correlated to employees leaving. However, since long working hours do not have a significant correlation with attrition, we can also infer that being invloved in too many tasks, i.e. being disorganized and distracted, causes lower satisfactory level than simply having longer working hours. 
+
+-----
 
 ## 2. Cluster Analysis and Segmentation
 
@@ -235,6 +242,8 @@ knitr::kable(round(cluster.profile, 2))
 
 Looking at the data, we realized our segments have been divided highly depending on the department employees belong to (The employees from same departments were all grouped in the same segment). Therefore, we will re-segment our data excluding departments, and only use the 'departments' for profiling.
 
+-----
+
 ### Test #2
 ### 2.1 Select segmentation variables and methods
 
@@ -327,6 +336,7 @@ knitr::kable(round(cluster.profile, 2))
 Segment 1 to 4 has quite clear differentiation among segments, and we were able to profile them as 'Quitters', 'Pampered Loyals', 'The Burned-outs', and 'Neglected Loyals'. However, everyone in Segment 5 has had a work accident (coefficient 1), which is a variable we consider not to be much meaningful in exploring who and how to retain.
 Therefore, we will redo the analysis again excluding work accident as a variable.
 
+-----
 
 ### Test #3
 ### 2.1 Select segmentation variables and methods
@@ -417,18 +427,22 @@ cluster.profile <- cbind (population_average,Cluster_Profile_mean)
 knitr::kable(round(cluster.profile, 2))
 ```
 
-### 2.5 Implications
+After analyzing the results, we were able to define each segment:
 
-Yonni
+* Segment 1 – *"revolving doors"* – low preforming with high likelihood to leave – these employees are low performers with low satisfaction levels. Although their average salary is just below company average they show very low commitment with low utilization and working hours way below average. 
 
-## 3. Drivers of Leaving Company
+* Segment 2 – *"pampered loyalists"* – high preforming with low likelihood to leave – the main characteristic of these employees is high salaries; almost double than the company average. They show very high satisfaction levels and average performance across all main parameters.   
 
-Yonni
+* Segment 3 – *"Burned"* – High preforming with high likelihood to leave – these employees show very low levels of satisfaction, probably due to over utilization (above average number of hours and number of projects). The high commitment does not reflect in salaries which are below average. 
 
-### 3.1 Classification tree
+* Segment 4 – *"Happy Cash Cows"* – high preforming low likelihood to leave – these employees show tremendously high levels of satisfaction although their salaries are extremely low. They present decent performance across all main parameters and are very unlikely to leave. 
+the interesting segment emerging from the analysis above is segment 3, good employees in high risk. The data revels four drivers for attrition: Low level of salary, high utilization and low levels of satisfaction. 
 
-Hiroko
+-----
 
+## 3. Classification Analysis
+
+We will also use the classification analysis methods to understand the key drivers for leaving. Hence our dependent variable is 'Whether employee has left.'
 
 ```{r setupclassification, echo=TRUE, tidy=TRUE}
 dependent_variable = 7
@@ -476,6 +490,8 @@ validation_data=ProjectDataFactor_scaled[validation_data_ids,]
 test_data=ProjectDataFactor_scaled[test_data_ids,]
 ```
 
+This is a “small tree” classification for example:
+
 ```{r}
 independent_variables_nolabel = colnames(ProjectDataFactor[,independent_variables])
 
@@ -502,23 +518,20 @@ CART_tree<-rpart(formula, data=estimation_data_nolabel, method="class", control=
 rpart.plot(CART_tree, box.palette="OrBu", type=3, extra=1, fallen.leaves=F, branch.lty=3)
 ```
 
-```{r}
-CART_tree_large<-rpart(formula, data=estimation_data_nolabel, method="class", control=rpart.control(cp = 0.005))
+From the tree analysis we can understand 'satisfacton level' is the most important driver. This is consistent with our segmentation, in which less satisfied segments are more likely to leave.
 
-rpart.plot(CART_tree_large, box.palette="OrBu", type=3, extra=1, fallen.leaves=F, branch.lty=3)
-```
-
-=======
-Yonni
+-----
 
 ## 4. Business Decisions
 
-Jenny
+To synthesize our analysis, we have three recommendations to companies.
 
-## 5. Future Work
+1. We recommend companies to allocate their resources to improving satisfaction among employees in Segment 3, the “Burned” employees since this segment represents those who are high performing but are also most likely to leave the company. To retain employees in this segment, companies should:
+    *increase salaries
+    *decrease the number of work hours, and;
+    *reduce the number of projects per employee, redirecting it to other employees.
+Additional research should be done to study qualitative alternatives to improve this segment’s work satisfaction.
 
-*I started writing this below but feel free to add, change, or delete, since I don't know what will come in 3 and 4!
+2. We recommend companies to gather additional employee information in order to further analyze Segment 4, such as employee function and employee seniority. This segment has significantly high employee satisfaction and performance yet have low likelihood of leaving, and further analysis should be focused on determining why this is. Our hypothesis is that Segment 4 may include a large number of junior employees or interns, who are content with learning and doing a large amount of work despite small pay. If this is so, then reproducing work conditions of Segment 4 to Segment 3 to retain “Burned” employees is not possible. Further analysis can confirm or reject this hypothesis. 
 
-First, companies can implement policies to control attrition rates, by managing the variables that have a high correlation with employees leaving. For example, companies could work to increase the satisfactory level of employees, especially in the variables that lead to low satisfactory level. To encourage the employees to stay longer, companies could share clear long term visions of the company to help employees envision their future together with the company. Companies could also implement strict working policies where employees would be restricted from joining above a certain number of projects, allowing them to deeply focus on only a few projects and therefore find more meaningful value and satisfaction. 
-
-Second, companies can use the prediction model to retain the high performing employees with high risk of leaving.
+3. We recommend companies to further analyze Segment 1 to understand why employees are low performing and why they leave. Several possible drivers for low performance could be inadequate training, bad management, or inaccurate guidance for HR hiring procedures (ie. Hiring the wrong people). This understanding can help companies to reduce costs associated with high employee turnover.
