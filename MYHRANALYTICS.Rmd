@@ -172,8 +172,6 @@ Hierarchical_Cluster_distances <- dist(ProjectData_segment, method=distance_used
 Hierarchical_Cluster <- hclust(Hierarchical_Cluster_distances, method=hclust_method)
 # Display dendogram
 iplot.dendrogram(Hierarchical_Cluster)
-# TODO: Draw dendogram with red borders around the 3 clusters
-#rect.hclust(Hierarchical_Cluster, k=numb_clusters_used, border="red")
 ```
 
 We can also plot the "distances" traveled before we need to merge any of the lower and smaller in size clusters into larger ones - the heights of the tree branches that link the clusters as we traverse the tree from its leaves to its root. If we have n observations, this plot has n-1 numbers, we see the first 20 here.
@@ -438,10 +436,10 @@ validation_data_percent = 10
 
 random_sampling = 0
 
-# Tree (CART) complexity control cp (e.g. 0.001 to 0.02, depending on the data)
-CART_cp = 0.01
+# Tree (CART) complexity control cp
+CART_cp = 0.02
 
-# the minimum size of a segment for the analysis to be done only for that segment
+# the minimum size of a segment for the analysis to be done
 min_segment = 100
 ```
 
@@ -449,9 +447,6 @@ min_segment = 100
 dependent_variable = unique(sapply(dependent_variable,function(i) min(ncol(ProjectDataFactor_scaled), max(i,1))))
 independent_variables = unique(sapply(independent_variables,function(i) min(ncol(ProjectDataFactor_scaled), max(i,1))))
 
-#Profit_Matrix = matrix(c(actual_1_predict_1, actual_0_predict_1, actual_1_predict_0, actual_0_predict_0), ncol=2)
-#colnames(Profit_Matrix)<- c("Predict 1", "Predict 0")
-#rownames(Profit_Matrix) <- c("Actual 1", "Actual 0")
 test_data_percent = 100 - estimation_data_percent - validation_data_percent
 CART_control = rpart.control(cp = CART_cp)
 ```
@@ -477,11 +472,10 @@ test_data=ProjectDataFactor_scaled[test_data_ids,]
 ```
 
 ```{r}
-# just name the variables numerically so that they look ok on the tree plots
-independent_variables_nolabel = paste("IV", 1:length(independent_variables), sep="")
+independent_variables_nolabel = colnames(ProjectDataFactor[,independent_variables])
 
 estimation_data_nolabel = cbind(estimation_data[,dependent_variable], estimation_data[,independent_variables])
-colnames(estimation_data_nolabel)<- c(colnames(estimation_data)[dependent_variable],independent_variables_nolabel)
+colnames(estimation_data_nolabel) <- c(colnames(estimation_data)[dependent_variable],independent_variables_nolabel)
 
 validation_data_nolabel = cbind(validation_data[,dependent_variable], validation_data[,independent_variables])
 colnames(validation_data_nolabel)<- c(dependent_variable,independent_variables_nolabel)
@@ -498,9 +492,15 @@ validation_data = data.frame(validation_data)
 test_data = data.frame(test_data)
 
 formula=paste(colnames(estimation_data)[dependent_variable],paste(Reduce(paste,sapply(head(independent_variables_nolabel,-1), function(i) paste(i,"+",sep=""))),tail(independent_variables_nolabel,1),sep=""),sep="~")
-CART_tree<-rpart(formula, data= estimation_data_nolabel,method="class", control=CART_control)
+CART_tree<-rpart(formula, data=estimation_data_nolabel, method="class", control=CART_control)
 
 rpart.plot(CART_tree, box.palette="OrBu", type=3, extra=1, fallen.leaves=F, branch.lty=3)
+```
+
+```{r}
+CART_tree_large<-rpart(formula, data=estimation_data_nolabel, method="class", control=rpart.control(cp = 0.005))
+
+rpart.plot(CART_tree_large, box.palette="OrBu", type=3, extra=1, fallen.leaves=F, branch.lty=3)
 ```
 
 
